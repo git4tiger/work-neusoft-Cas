@@ -1,0 +1,74 @@
+@charset "utf-8";
+.body_bg {
+	font-family: Verdana, Arial, Helvetica, sans-serif;
+	font-size: 12px;
+	background-color: #5e96c5;
+	background-image: url(new_images/login_bk.jpg);
+	background-position: left top;
+	text-align: center;
+}
+.login_bg {
+	font-family: Verdana, Arial, Helvetica, sans-serif;
+	font-size: 12px;
+	background-image: url(new_images/login.jpg);
+	background-repeat: no-repeat;
+	background-position: left top;
+	height: 605px;
+	width: 829px;
+}
+.table {
+	font-family: Verdana, Arial, Helvetica, sans-serif, "宋体";
+	font-size: 12px;
+}
+.text_copyright {
+	font-family: Verdana, Arial, Helvetica, sans-serif;
+	font-size: 12px;
+	color: white;
+}
+.input_bg1 {
+	font-family: Verdana, Arial, Helvetica, sans-serif, "宋体";
+	font-size: 12px;
+	color: #000000;
+	width: 180px;
+	height: 18px;
+	padding-top: 3px;
+	padding-left: 3px;
+	background-image: url(new_images/text-bg.gif);
+	background-repeat: repeat-x;
+	border: 1px solid #7f9db9;
+}
+.input_bg2 {
+	font-family: Verdana, Arial, Helvetica, sans-serif, "宋体";
+	font-size: 12px;
+	color: #000000;
+	width: 100px;
+	height: 18px;
+	padding-top: 3px;
+	padding-left: 3px;
+	background-image: url(new_images/text-bg.gif);
+	background-repeat: repeat-x;
+	border: 1px solid #7f9db9;
+}
+.input_yzm {
+	font-family: Verdana, Arial, Helvetica, sans-serif, "宋体";
+	font-size: 12px;
+	color: #000000;
+	width: 76px;
+	height: 24px;
+	padding-top: 3px;
+	padding-left: 3px;
+	border: 1px solid #7f9db9;
+	background-color: #CCCCCC;
+}
+.login_td{
+	font-family: Verdana, Arial, Helvetica, sans-serif, "宋体";
+	font-size: 12px;
+	width:95px ;
+	height:28px;
+	text-align:right;
+
+}
+#status11{
+    color: black;
+    font-weight: 800;
+}

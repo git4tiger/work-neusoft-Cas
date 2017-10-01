@@ -1,0 +1,334 @@
+<?xml version="1.0" encoding="UTF-8"?>
+	<!-- version 20150814001 -->
+<web-app xmlns="http://java.sun.com/xml/ns/j2ee" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://java.sun.com/xml/ns/j2ee http://java.sun.com/xml/ns/j2ee/web-app_2_4.xsd"
+	version="2.4">
+	<display-name>Central Authentication System (CAS) 3.0</display-name>
+	<context-param>
+		<param-name>contextConfigLocation</param-name>
+		<param-value>/WEB-INF/applicationContext.xml,
+			/WEB-INF/deployerConfigContext.xml
+			/WEB-INF/securityContext.xml</param-value>
+	</context-param>
+	<context-param>
+		<param-name>log4jConfigLocation</param-name>
+		<param-value>classpath:log4j.properties</param-value>
+	</context-param>
+	<context-param>
+		<param-name>log4jExposeWebAppRoot</param-name>
+		<param-value>false</param-value>
+	</context-param>
+	<!--
+		<filter> <filter-name>EncodingFilter</filter-name>
+		<description>EncodingFilter</description>
+		<filter-class>com.neusoft.EncodingFilter</filter-class> <init-param>
+		<param-name>encoding</param-name> <param-value>UTF-8</param-value>
+		<description>encoding_charset</description> </init-param> <init-param>
+		<param-name>ignore</param-name> <param-value>true</param-value>
+		<description>ignore</description> </init-param> </filter>
+	-->
+	<!--
+		struts2 配置 <filter> <filter-name>struts2</filter-name>
+		<filter-class>org.apache.struts2.dispatcher.FilterDispatcher</filter-class>
+		</filter> <filter-mapping> <filter-name>struts2</filter-name>
+		<url-pattern>/user/*</url-pattern> </filter-mapping>
+	-->
+	<!-- struts2  end  -->
+
+	<filter>
+		<filter-name>xssFilter</filter-name>
+		<filter-class>com.neusoft.filter.XssFilter</filter-class>
+	</filter>
+	<filter-mapping>
+		<filter-name>xssFilter</filter-name>
+		<url-pattern>/*</url-pattern>
+	</filter-mapping>
+
+	<filter>
+		<filter-name>Acegi Filter Chain Proxy</filter-name>
+		<filter-class>org.acegisecurity.util.FilterToBeanProxy</filter-class>
+		<init-param>
+			<param-name>targetClass</param-name>
+			<param-value>org.acegisecurity.util.FilterChainProxy</param-value>
+		</init-param>
+	</filter>
+	<!--
+		<filter-mapping> <filter-name>EncodingFilter</filter-name>
+		<url-pattern>/*</url-pattern> </filter-mapping>
+	-->
+	<filter-mapping>
+		<filter-name>Acegi Filter Chain Proxy</filter-name>
+		<url-pattern>/services/*</url-pattern>
+	</filter-mapping>
+	<!--
+		- Configures Log4J for this web app. - As this context specifies a
+		context-param "log4jConfigLocation", its file path - is used to load
+		the Log4J configuration, including periodic refresh checks. - - Would
+		fall back to default Log4J initialization (non-refreshing) if no
+		special - context-params are given. - - Exports a "web app root key",
+		i.e. a system property that specifies the root - directory of this web
+		app, for usage in log file paths. - This web app specifies "cas.root"
+		(see log4j.properties file).
+	-->
+	<!-- Leave the listener commented-out if using JBoss -->
+	<listener>
+		<listener-class>org.springframework.web.util.Log4jConfigListener</listener-class>
+	</listener>
+	<!--
+		- Loads the CAS ApplicationContext. - The deployer choice here is how
+		to handle Throwables thrown by Spring's - ContextLoaderListener. The
+		Spring ContextLoaderListener will throw an exception when the -
+		application context cannot be loaded, say because the bean XML files
+		are not valid XML or do not - refer to real classes and properties or
+		because a bean configured via Spring throws an exception - at
+		construction, property setting, or on an afterPropertiesSet()
+		lifecycle method. - - If you'd like these errors to be fatal and
+		prevent the CAS servlet context from loading at all, - use
+		org.springframework.web.context.ContextLoaderListener. - - If you'd
+		like these errors to result in all requests for CAS getting a "CAS is
+		Unavailable" response, - use
+		org.jasig.cas.web.init.SafeContextLoaderListener
+	-->
+	<listener>
+		<listener-class>org.jasig.cas.web.init.SafeContextLoaderListener</listener-class>
+	</listener>
+	<!--
+		- This is the Spring dispatcher servlet which delegates all requests
+		to the - Spring WebMVC controllers as configured in cas-servlet.xml. -
+		- The choice made above about how to handle a broken
+		ApplicationContext at - context initialization applies here as well,
+		sicne this servlet is load-on-startup. - - If you'd like these errors
+		to be fatal and prevent the CAS servlet from loading at all, - use
+		org.springframework.web.servlet.DispatcherServlet. - - If you'd like
+		these errors to result in all requests for CAS getting a "CAS is
+		Unavailable" response, - use
+		org.jasig.cas.web.init.SafeDispatcherServlet
+	-->
+	<servlet>
+		<servlet-name>cas</servlet-name>
+		<servlet-class>org.jasig.cas.web.init.SafeDispatcherServlet</servlet-class>
+		<init-param>
+			<param-name>publishContext</param-name>
+			<param-value>false</param-value>
+		</init-param>
+		<load-on-startup>1</load-on-startup>
+	</servlet>
+	<servlet>
+		<servlet-name>jcaptcha</servlet-name>
+		<servlet-class>com.neusoft.unieap.service.security.ui.jcaptcha.EAPImageCaptchaServlet</servlet-class>
+		<load-on-startup>0</load-on-startup>
+	</servlet>
+
+	<servlet-mapping>
+		<servlet-name>jcaptcha</servlet-name>
+		<url-pattern>/jcaptcha/*</url-pattern>
+	</servlet-mapping>
+	<servlet-mapping>
+		<servlet-name>cas</servlet-name>
+		<url-pattern>/login</url-pattern>
+	</servlet-mapping>
+	<servlet-mapping>
+		<servlet-name>cas</servlet-name>
+		<url-pattern>/logout</url-pattern>
+	</servlet-mapping>
+	<servlet-mapping>
+		<servlet-name>cas</servlet-name>
+		<url-pattern>/validate</url-pattern>
+	</servlet-mapping>
+	<servlet-mapping>
+		<servlet-name>cas</servlet-name>
+		<url-pattern>/serviceValidate</url-pattern>
+	</servlet-mapping>
+	<servlet-mapping>
+		<servlet-name>cas</servlet-name>
+		<url-pattern>/samlValidate</url-pattern>
+	</servlet-mapping>
+	<servlet-mapping>
+		<servlet-name>cas</servlet-name>
+		<url-pattern>/proxy</url-pattern>
+	</servlet-mapping>
+	<servlet-mapping>
+		<servlet-name>cas</servlet-name>
+		<url-pattern>/proxyValidate</url-pattern>
+	</servlet-mapping>
+	<servlet-mapping>
+		<servlet-name>cas</servlet-name>
+		<url-pattern>/CentralAuthenticationService</url-pattern>
+	</servlet-mapping>
+	<servlet-mapping>
+		<servlet-name>cas</servlet-name>
+		<url-pattern>/services/add.html</url-pattern>
+	</servlet-mapping>
+	<servlet-mapping>
+		<servlet-name>cas</servlet-name>
+		<url-pattern>/services/logout.html</url-pattern>
+	</servlet-mapping>
+	<servlet-mapping>
+		<servlet-name>cas</servlet-name>
+		<url-pattern>/services/loggedOut.html</url-pattern>
+	</servlet-mapping>
+	<servlet-mapping>
+		<servlet-name>cas</servlet-name>
+		<url-pattern>/services/manage.html</url-pattern>
+	</servlet-mapping>
+	<servlet-mapping>
+		<servlet-name>cas</servlet-name>
+		<url-pattern>/services/edit.html</url-pattern>
+	</servlet-mapping>
+	<servlet-mapping>
+		<servlet-name>cas</servlet-name>
+		<url-pattern>/openid/*</url-pattern>
+	</servlet-mapping>
+	<servlet-mapping>
+		<servlet-name>cas</servlet-name>
+		<url-pattern>/services/deleteRegisteredService.html</url-pattern>
+	</servlet-mapping>
+
+	<!-- add by jacktong 2015-7-15 -->
+	<servlet>
+		<servlet-name>getAccountInfo</servlet-name>
+		<servlet-class>com.neusoft.controller.UserServiceController</servlet-class>
+	</servlet>
+	<servlet-mapping>
+		<servlet-name>getAccountInfo</servlet-name>
+		<url-pattern>/user/getAccountInfo</url-pattern>
+	</servlet-mapping>
+	<servlet>
+		<servlet-name>registe</servlet-name>
+		<servlet-class>com.neusoft.controller.UserRegiste</servlet-class>
+	</servlet>
+	<servlet-mapping>
+		<servlet-name>registe</servlet-name>
+		<url-pattern>/user/registe</url-pattern>
+	</servlet-mapping>
+
+	<servlet>
+		<servlet-name>registeController</servlet-name>
+		<servlet-class>com.neusoft.controller.UserRegisteController</servlet-class>
+	</servlet>
+	<servlet-mapping>
+		<servlet-name>registeController</servlet-name>
+		<url-pattern>/user/registeController</url-pattern>
+	</servlet-mapping>
+
+	<servlet>
+		<servlet-name>modifyAccount</servlet-name>
+		<servlet-class>com.neusoft.controller.ModifyAccount</servlet-class>
+	</servlet>
+	<servlet-mapping>
+		<servlet-name>modifyAccount</servlet-name>
+		<url-pattern>/user/modifyaccount</url-pattern>
+	</servlet-mapping>
+
+	<servlet>
+		<servlet-name>modifyAccountController</servlet-name>
+		<servlet-class>com.neusoft.controller.ModifyAccountController</servlet-class>
+	</servlet>
+	<servlet-mapping>
+		<servlet-name>modifyAccountController</servlet-name>
+		<url-pattern>/user/modifyaccountController</url-pattern>
+	</servlet-mapping>
+
+	<!-- end by jacktong 2015-7-15 -->
+	<!-- add by jacktong 2015-7-16 -->
+	<servlet>
+		<servlet-name>accountIsExist</servlet-name>
+		<servlet-class>com.neusoft.controller.UserIsExistController</servlet-class>
+	</servlet>
+	<servlet-mapping>
+		<servlet-name>accountIsExist</servlet-name>
+		<url-pattern>/user/acountIsExist</url-pattern>
+	</servlet-mapping>
+
+	<servlet>
+		<servlet-name>phoneIsExist</servlet-name>
+		<servlet-class>com.neusoft.controller.PhoneIsExistController</servlet-class>
+	</servlet>
+	<servlet-mapping>
+		<servlet-name>phoneIsExist</servlet-name>
+		<url-pattern>/user/phoneIsExist</url-pattern>
+	</servlet-mapping>
+	<!-- end by jacktong 2015-7-16 -->
+	<!-- add by jacktong 2015-7-21 -->
+	<servlet>
+		<servlet-name>sendCode</servlet-name>
+		<servlet-class>com.neusoft.controller.SendCodeController</servlet-class>
+	</servlet>
+	<servlet-mapping>
+		<servlet-name>sendCode</servlet-name>
+		<url-pattern>/user/sendcode</url-pattern>
+	</servlet-mapping>
+
+	<servlet>
+		<servlet-name>checkCode</servlet-name>
+		<servlet-class>com.neusoft.controller.CheckCodeController</servlet-class>
+	</servlet>
+	<servlet-mapping>
+		<servlet-name>checkCode</servlet-name>
+		<url-pattern>/user/checkcode</url-pattern>
+	</servlet-mapping>
+	<!-- end 2015-7-21 -->
+	<servlet>
+		<servlet-name>resetPassword</servlet-name>
+		<servlet-class>com.neusoft.controller.ResetPasswordController</servlet-class>
+	</servlet>
+	<servlet-mapping>
+		<servlet-name>resetPassword</servlet-name>
+		<url-pattern>/user/resetPassword</url-pattern>
+	</servlet-mapping>
+
+	<servlet>
+		<servlet-name>perResetPassword</servlet-name>
+		<servlet-class>com.neusoft.controller.ResetPassword</servlet-class>
+	</servlet>
+	<servlet-mapping>
+		<servlet-name>perResetPassword</servlet-name>
+		<url-pattern>/user/perResetPassword</url-pattern>
+	</servlet-mapping>
+
+	<servlet>
+		<servlet-name>checkAccountAndPhone</servlet-name>
+		<servlet-class>com.neusoft.controller.CheckAccountAndPhoneController</servlet-class>
+	</servlet>
+	<servlet-mapping>
+		<servlet-name>checkAccountAndPhone</servlet-name>
+		<url-pattern>/user/checkAccountAdnPhone</url-pattern>
+	</servlet-mapping>
+
+	<servlet>
+		<servlet-name>userRegisteService</servlet-name>
+		<servlet-class>com.neusoft.controller.UserRegisteServiceController</servlet-class>
+	</servlet>
+	<servlet-mapping>
+		<servlet-name>userRegisteService</servlet-name>
+		<url-pattern>/user/userRegisteService</url-pattern>
+	</servlet-mapping>
+	
+	<servlet>
+		<servlet-name>userChangePasswordService</servlet-name>
+		<servlet-class>com.neusoft.controller.ChangePasswordServiceController</servlet-class>
+	</servlet>
+	<servlet-mapping>
+		<servlet-name>userChangePasswordService</servlet-name>
+		<url-pattern>/user/userChangePasswordService</url-pattern>
+	</servlet-mapping>
+
+
+	<session-config>
+		<!-- Default to 5 minute session timeouts -->
+		<session-timeout>5</session-timeout>
+	</session-config>
+	<error-page>
+		<exception-type>org.springframework.context.ApplicationContextException</exception-type>
+		<location>/WEB-INF/view/jsp/brokenContext.jsp</location>
+	</error-page>
+	<!--
+		<error-page> <exception-type>java.lang.Exception</exception-type>
+		<location>/WEB-INF/view/jsp/errors.jsp</location> </error-page>
+	-->
+	<error-page>
+		<error-code>404</error-code>
+		<location>/</location>
+	</error-page>
+</web-app>
+
